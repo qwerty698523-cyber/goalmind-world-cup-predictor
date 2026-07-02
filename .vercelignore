@@ -1,0 +1,17 @@
+.npm-cache/
+.vercel-home/
+.vercel-global/
+.vercel/
+chrome-profile/
+edge-profile/
+chrome-profile-test/
+edge-profile-test/
+qa-*.png
+dom-test.html
+preview-*.png
+live-*.png
+server-*.log
+启动网站.cmd
+登录并发布网站.cmd
+deployment-url.txt
+release-report.json

@@ -1,0 +1,15 @@
+live-cache.json
+chrome-profile/
+edge-profile/
+chrome-profile-test/
+edge-profile-test/
+preview-*.png
+live-*.png
+qa-*.png
+.npm-cache/
+.vercel-home/
+.vercel-global/
+.vercel/
+deployment-url.txt
+release-report.json
+.agents/

@@ -1,0 +1,8 @@
+{
+  "name": "GoalMind 世界杯动态战力预测",
+  "short_name": "GoalMind",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#050b14",
+  "theme_color": "#07111f"
+}

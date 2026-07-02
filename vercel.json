@@ -1,0 +1,23 @@
+{
+  "version": 2,
+  "functions": {
+    "api/world-cup.js": {
+      "maxDuration": 20
+    },
+    "api/match-detail.js": {
+      "maxDuration": 20
+    },
+    "api/team-profile.js": {
+      "maxDuration": 20
+    }
+  },
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
+      ]
+    }
+  ]
+}

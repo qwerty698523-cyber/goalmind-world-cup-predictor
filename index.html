@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#07111f">
+  <meta name="description" content="2026 世界杯实时赛程、比分、动态战力排名与比赛概率预测。">
+  <meta name="keywords" content="2026世界杯,世界杯赛程,世界杯预测,战力排名,足球比分">
+  <meta name="robots" content="index,follow">
+  <meta property="og:title" content="GoalMind · 2026 世界杯动态战力预测">
+  <meta property="og:description" content="实时赛程、比分、动态战力与比赛概率预测。">
+  <meta property="og:type" content="website">
+  <title>GoalMind · 世界杯动态战力预测</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%2359e2b3'/%3E%3Ctext x='32' y='43' text-anchor='middle' font-family='Arial' font-size='36' font-weight='700' fill='%2304110d'%3EG%3C/text%3E%3C/svg%3E">
+  <link rel="manifest" href="site.webmanifest">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="#dashboard" aria-label="GoalMind 首页">
+        <span class="brand-mark">G</span>
+        <span><b>GOALMIND</b><small>WORLD CUP LAB</small></span>
+      </a>
+
+      <nav class="main-nav" aria-label="主导航">
+        <button class="nav-item active" data-view="dashboard"><span>⌂</span>预测中心</button>
+        <button class="nav-item" data-view="matches"><span>▦</span>比赛日程</button>
+        <button class="nav-item" data-view="simulation"><span>◇</span>赛事模拟</button>
+        <button class="nav-item" data-view="rankings"><span>↗</span>战力排名</button>
+        <button class="nav-item" data-view="method"><span>◎</span>模型说明</button>
+      </nav>
+
+      <div class="sidebar-note">
+        <span class="pulse"></span>
+        <div><b>实时数据已接入</b><small id="sidebarSyncText">正在连接同步服务</small></div>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">2026 WORLD CUP · PREDICTION LAB</p>
+          <h1 id="pageTitle">比赛预测中心</h1>
+        </div>
+        <div class="top-actions">
+          <span class="model-badge">ELO LIVE</span>
+          <button class="icon-button" id="themeButton" title="切换亮度" aria-label="切换亮度">☼</button>
+          <div class="avatar">GM</div>
+        </div>
+      </header>
+
+      <section class="view active" id="dashboardView">
+        <div class="status-strip">
+          <span id="syncState"><i class="live-dot"></i>正在同步赛事</span>
+          <span>赛事：<b id="matchCount">--</b></span>
+          <span>球队：<b id="teamCount">--</b></span>
+          <span>更新：<b id="syncTime">--:--</b></span>
+          <button class="sync-button" id="syncButton">立即同步</button>
+        </div>
+
+        <section class="prediction-card panel glow-panel" id="predictionCard">
+          <div class="panel-heading">
+            <div>
+              <span class="section-kicker">MATCH PREDICTION</span>
+              <h2>对战预测</h2>
+            </div>
+            <div class="venue-toggle">
+              <span class="match-status-badge" id="matchStatusBadge">预测</span>
+              <button class="toggle-button active" data-venue="home">主场</button>
+              <button class="toggle-button" data-venue="neutral">中立场</button>
+            </div>
+          </div>
+
+          <div class="matchup">
+            <div class="team-side">
+              <label for="homeTeam">主队</label>
+              <div class="team-select-wrap">
+                <span class="team-flag" id="homeFlag">🇲🇽</span>
+                <select id="homeTeam" aria-label="选择主队"></select>
+              </div>
+              <div class="rating-pill"><span>战力</span><b id="homeRating">--</b><em id="homeTrend">--</em></div>
+              <button class="profile-link" data-profile-side="home">查看球队档案</button>
+            </div>
+
+            <div class="prediction-center">
+              <p class="match-meta" id="matchMeta">小组赛 · 90 分钟</p>
+              <div class="score-display"><div class="scoreline"><strong id="homeScore">-</strong><span>:</span><strong id="awayScore">-</strong></div><small class="score-prediction" id="scorePrediction" hidden></small></div>
+              <p class="score-caption" id="scoreCaption">最可能比分</p>
+              <button class="swap-button" id="swapTeams" aria-label="交换主客队">⇄ 交换球队</button>
+            </div>
+
+            <div class="team-side away">
+              <label for="awayTeam">客队</label>
+              <div class="team-select-wrap">
+                <span class="team-flag" id="awayFlag">🇿🇦</span>
+                <select id="awayTeam" aria-label="选择客队"></select>
+              </div>
+              <div class="rating-pill"><span>战力</span><b id="awayRating">--</b><em id="awayTrend">--</em></div>
+              <button class="profile-link" data-profile-side="away">查看球队档案</button>
+            </div>
+          </div>
+
+          <div class="probabilities">
+            <div class="probability home-prob">
+              <div><span>主胜</span><b id="homeWin">--%</b></div>
+              <div class="bar"><i id="homeWinBar"></i></div>
+            </div>
+            <div class="probability draw-prob">
+              <div><span>平局</span><b id="draw">--%</b></div>
+              <div class="bar"><i id="drawBar"></i></div>
+            </div>
+            <div class="probability away-prob">
+              <div><span>客胜</span><b id="awayWin">--%</b></div>
+              <div class="bar"><i id="awayWinBar"></i></div>
+            </div>
+          </div>
+          <div class="prediction-detail-grid" aria-label="完整预测拆解">
+            <article>
+              <span>候选比分</span>
+              <b id="scoreCandidateLead">--</b>
+              <small id="scoreCandidateList">等待模型生成前三候选比分</small>
+            </article>
+            <article>
+              <span>进球模型</span>
+              <b id="goalModelLead">--</b>
+              <small id="goalModelDetail">等待 xG、总进球与双方进球概率</small>
+            </article>
+            <article id="knockoutAdvanceCard" hidden>
+              <span>淘汰赛晋级</span>
+              <b id="advanceLead">--</b>
+              <small id="advanceDetail">90 分钟打平后将进入加时赛，仍平则点球大战决定晋级。</small>
+            </article>
+            <article>
+              <span>预测记录</span>
+              <b id="predictionVersion">--</b>
+              <small id="predictionMeta">预测会在开赛前锁定，赛后仅做评价，不回写历史预测。</small>
+            </article>
+          </div>
+        </section>
+
+        <div class="dashboard-grid">
+          <section class="panel factors-panel">
+            <div class="panel-heading compact">
+              <div><span class="section-kicker">FACTOR BREAKDOWN</span><h2>实力因子</h2></div>
+              <span class="subtle">0 — 100</span>
+            </div>
+            <div class="factor-team-head">
+              <span id="factorHomeName">主队</span><span>指标</span><span id="factorAwayName">客队</span>
+            </div>
+            <div id="factorRows" class="factor-rows"></div>
+          </section>
+
+          <section class="panel matrix-panel">
+            <div class="panel-heading compact">
+              <div><span class="section-kicker">SCORE MATRIX</span><h2>比分概率矩阵</h2></div>
+              <span class="subtle">Poisson</span>
+            </div>
+            <div class="xg-summary">
+              <div><span id="xgHomeName">主队</span><b id="homeXg">--</b><small>xG</small></div>
+              <span>期望进球</span>
+              <div><span id="xgAwayName">客队</span><b id="awayXg">--</b><small>xG</small></div>
+            </div>
+            <div id="scoreMatrix" class="score-matrix" aria-label="比分概率矩阵"></div>
+          </section>
+
+          <section class="panel context-panel">
+            <div class="panel-heading compact">
+              <div><span class="section-kicker">CONTEXT VARIABLES</span><h2>天气与伤病变量</h2></div>
+              <span class="subtle" id="contextSource">实时同步</span>
+            </div>
+            <div class="context-grid">
+              <article>
+                <span>比赛天气</span>
+                <b id="weatherSummary">等待同步</b>
+                <p id="weatherImpact">天气会影响比赛节奏、传中落点、射门质量与平局概率。</p>
+              </article>
+              <article>
+                <span id="homeAvailabilityName">主队人员</span>
+                <b id="homeAvailabilitySummary">暂无官方伤病名单</b>
+                <p id="homeAvailabilityImpact">人员可用性会修正进攻、防守和控球稳定性。</p>
+              </article>
+              <article>
+                <span id="awayAvailabilityName">客队人员</span>
+                <b id="awayAvailabilitySummary">暂无官方伤病名单</b>
+                <p id="awayAvailabilityImpact">正式名单发布后会自动更新伤病与不可用影响。</p>
+              </article>
+            </div>
+          </section>
+
+        </div>
+
+        <section class="panel match-intelligence-panel" id="matchIntelligencePanel">
+          <div class="panel-heading">
+            <div><span class="section-kicker" id="insightKicker">PRE-MATCH INTELLIGENCE</span><h2 id="insightTitle">赛前预测</h2></div>
+            <div class="insight-status"><span id="insightStatus">等待确定赛程</span><small id="insightUpdatedAt"></small></div>
+          </div>
+          <div class="insight-empty" id="insightEmpty" hidden>详细赛前预测仅为已经确定双方球队的世界杯赛程生成。请从“比赛日程”中选择一场比赛。</div>
+
+          <div id="preMatchInsight">
+            <div class="insight-summary-grid">
+              <article><span>比赛走势</span><p id="preMatchScript"></p></article>
+              <article><span>关键进球阶段</span><p id="preScoringWindow"></p></article>
+              <article><span>预测可信度</span><b id="preConfidence">--%</b><small id="preCalibrationNote"></small></article>
+              <article><span>预期比赛数据</span><div class="expected-stats" id="preExpectedStats"></div></article>
+            </div>
+            <div class="insight-evidence-grid" id="preEvidenceGrid"></div>
+            <div class="team-plan-grid">
+              <article class="team-plan-card" id="homePlanCard">
+                <header><div id="homePlanLogo"></div><div><span id="homePlanName">主队</span><b id="homeFormation">--</b></div></header>
+                <div class="plan-block"><span>战术思路</span><p id="homeApproach"></p></div>
+                <div class="plan-block"><span>预计阵型与首发框架</span><div class="lineup-framework" id="homeLineupFramework"></div></div>
+                <div class="plan-block"><span>主要进球点</span><ul id="homeGoalRoutes"></ul></div>
+                <div class="plan-block"><span>无球重点</span><p id="homeDefensiveFocus"></p></div>
+              </article>
+              <article class="team-plan-card away-plan" id="awayPlanCard">
+                <header><div id="awayPlanLogo"></div><div><span id="awayPlanName">客队</span><b id="awayFormation">--</b></div></header>
+                <div class="plan-block"><span>战术思路</span><p id="awayApproach"></p></div>
+                <div class="plan-block"><span>预计阵型与首发框架</span><div class="lineup-framework" id="awayLineupFramework"></div></div>
+                <div class="plan-block"><span>主要进球点</span><ul id="awayGoalRoutes"></ul></div>
+                <div class="plan-block"><span>无球重点</span><p id="awayDefensiveFocus"></p></div>
+              </article>
+            </div>
+          </div>
+
+          <div id="postMatchInsight" hidden>
+            <div class="postmatch-grid">
+              <article class="actual-summary-card">
+                <div class="insight-card-head"><div><span class="section-kicker">WHAT HAPPENED</span><h3>赛后总结</h3></div><span id="actualDataState">正在载入官方比赛数据</span></div>
+                <p id="actualMatchSummary"></p>
+                <div class="deep-report-grid" id="actualDeepReport"></div>
+                <div class="actual-stats" id="actualStats"></div>
+                <div class="event-timeline" id="actualEvents"></div>
+              </article>
+              <article class="lineup-card">
+                <div class="insight-card-head"><div><span class="section-kicker">LINEUPS</span><h3>实际阵型与首发</h3></div></div>
+                <div class="actual-lineups" id="actualLineups"></div>
+              </article>
+            </div>
+            <article class="comparison-card">
+              <div class="insight-card-head"><div><span class="section-kicker">PREDICTION REVIEW</span><h3>赛前预测与真实比赛对照</h3></div><span id="comparisonVerdict"></span></div>
+              <div class="comparison-grid" id="predictionComparison"></div>
+            </article>
+            <article class="learning-card">
+              <div class="insight-card-head"><div><span class="section-kicker">MODEL LEARNING</span><h3>本场复盘如何改进后续预测</h3></div><span id="learningSampleCount"></span></div>
+              <div class="learning-grid" id="learningAdjustments"></div>
+            </article>
+          </div>
+        </section>
+      </section>
+
+      <section class="view" id="matchesView">
+        <section class="panel page-panel">
+          <div class="panel-heading"><div><span class="section-kicker">MATCH CENTER</span><h2>比赛日程</h2></div><span class="model-badge" id="scheduleDataBadge">同步中</span></div>
+          <div class="filter-row">
+            <button class="filter-button active" data-filter="all">全部</button>
+            <button class="filter-button" data-filter="group">小组赛</button>
+            <button class="filter-button" data-filter="knockout">淘汰赛</button>
+          </div>
+          <div id="matchList" class="match-list"></div>
+        </section>
+      </section>
+
+      <section class="view" id="simulationView">
+        <section class="panel page-panel simulation-page">
+          <div class="panel-heading">
+            <div><span class="section-kicker">TOURNAMENT SIMULATOR</span><h2>世界杯全程模拟</h2></div>
+            <button class="sync-button" id="rerunSimulation">按最新数据重算</button>
+          </div>
+          <p class="panel-copy wide">已完赛场次使用真实结果，其余比赛根据最新动态战力、状态与攻防能力逐场推演。真实结果出现后，出线队伍和后续淘汰赛会自动重新计算。</p>
+          <div class="simulation-overview">
+            <div><span>真实赛果</span><b id="simulationActualCount">0</b><small>已纳入推演</small></div>
+            <div><span>预测修正</span><b id="simulationCorrectedCount">0</b><small>与原预测有出入</small></div>
+            <div><span>剩余模拟</span><b id="simulationRemainingCount">0</b><small>动态推演场次</small></div>
+            <div><span>最近更新</span><b id="simulationUpdatedAt">--:--</b><small>实时数据同步</small></div>
+            <div class="simulation-champion" id="simulationChampion"></div>
+          </div>
+          <div class="simulation-section-head"><div><span class="section-kicker">GROUP PROJECTION</span><h3>小组出线模拟</h3></div><small>前两名及 8 支最佳第三名晋级</small></div>
+          <div class="simulation-groups" id="simulationGroups"></div>
+          <div class="simulation-section-head"><div><span class="section-kicker">KNOCKOUT PATH</span><h3>淘汰赛晋级路线</h3></div><small>真实赛果会替换模拟并重算后续</small></div>
+          <div class="simulation-bracket" id="simulationBracket"></div>
+        </section>
+      </section>
+
+      <section class="view" id="rankingsView">
+        <section class="panel page-panel">
+          <div class="panel-heading"><div><span class="section-kicker">DYNAMIC POWER INDEX</span><h2>国家队动态战力排名</h2></div><button class="text-button" id="syncRatingsTop">同步最新</button></div>
+          <p class="panel-copy wide">战力值以近四年国家队比赛为基础，本届世界杯开赛后只根据赛前实力预期、真实结果与比分质量动态调整；强队未达预期会扣分，弱队超出预期会加分。</p>
+          <div class="ranking-table-wrap">
+            <table class="ranking-table">
+              <thead><tr><th>#</th><th>球队</th><th>战力</th><th>近期</th><th>进攻</th><th>防守</th><th>本届变化</th><th></th></tr></thead>
+              <tbody id="rankingTable"></tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+
+      <section class="view" id="methodView">
+        <section class="panel page-panel method-page">
+          <div class="panel-heading"><div><span class="section-kicker">HOW IT WORKS</span><h2>动态战力模型说明</h2></div><span class="model-badge">透明可解释</span></div>
+          <div class="formula-card"><span>赛前期望</span><code>E = 1 / (1 + 10 ^ ((R<sub>对手</sub> - R<sub>本队</sub>) / 400))</code></div>
+          <div class="formula-card"><span>赛后更新</span><code>R' = R + 结果差 + 进球质量 + 防守质量 + 净胜球质量</code></div>
+          <div class="model-audit" id="modelAuditGrid" aria-label="模型预测质量审计"></div>
+          <div class="method-grid">
+            <article><b>实力预期</b><p>先用双方赛前战力、主场因素和攻防结构计算每队应拿到的结果与大致进球水平。</p></article>
+            <article><b>结果差</b><p>真实结果高于预期就加分，低于预期就扣分；强队打平弱队会扣分，弱队逼平强队会加分。</p></article>
+            <article><b>表现质量</b><p>进球数、丢球数和净胜球会与赛前预期比分比较，避免只看胜平负而忽略比赛质量。</p></article>
+            <article><b>非机械零和</b><p>两队各自按自己的表现更新，不要求一队加多少另一队就扣多少，因此可能出现双方小涨或双方小降。</p></article>
+            <article><b>天气变量</b><p>按比赛球场的小时级预报修正节奏、射门质量和平局概率；强风、降雨、高温会降低模型置信度。</p></article>
+            <article><b>伤病变量</b><p>同步球队名单中的不可用与存疑人员，按位置影响进攻、防守、控球和总战力，赛前预测会自动吸收这些变化。</p></article>
+            <article><b>动态进球校准</b><p>每轮已完赛样本会比较“赛前预测总进球”和“真实总进球”，如果模型持续偏保守，后续赛程会自动抬高 xG 与比分选择阈值。</p></article>
+          </div>
+          <div class="settings-box">
+            <h3>模型参数</h3>
+            <label>基础 K 因子 <input id="kFactor" type="range" min="16" max="48" step="4" value="32"><output id="kFactorOutput">32</output></label>
+            <label>主场战力加成 <input id="homeBonus" type="range" min="0" max="100" step="5" value="65"><output id="homeBonusOutput">65</output></label>
+            <label>近期状态权重 <input id="formWeight" type="range" min="0" max="1" step="0.1" value="0.4"><output id="formWeightOutput">0.4</output></label>
+          </div>
+          <p class="disclaimer">赛程与比分由 ESPN 同步；历史比赛来自 International football results（CC0）。模型结果不构成投注或其他决策建议。</p>
+        </section>
+      </section>
+
+      <footer>GoalMind World Cup Lab · 世界杯：ESPN · 近四年赛果：International football results (CC0) · 预测仅供参考</footer>
+    </main>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="team-modal" id="teamModal" hidden>
+    <div class="team-modal-backdrop" data-close-profile></div>
+    <section class="team-profile" role="dialog" aria-modal="true" aria-labelledby="profileTeamName">
+      <button class="profile-close" data-close-profile aria-label="关闭球队档案">×</button>
+      <header class="profile-header">
+        <div id="profileTeamLogo"></div>
+        <div><span class="section-kicker">TEAM INTELLIGENCE</span><h2 id="profileTeamName">球队档案</h2><p id="profileTeamMeta"></p></div>
+      </header>
+      <div class="profile-rating-row" id="profileRatingRow"></div>
+      <div class="profile-data-state"><span class="status-dot"></span><b id="profileDataState">正在载入球队名单与比赛数据</b><small id="profileDataUpdated"></small></div>
+
+      <section class="profile-style-overview">
+        <div class="profile-section-head"><h3>球队风格与比赛结构</h3><span>官方数据 + GoalMind 模型解读</span></div>
+        <div class="profile-style-tags" id="profileStyleTags"></div>
+        <div class="profile-style-cards">
+          <article><span>主要优势</span><div id="profileStrengths"></div></article>
+          <article><span>主要风险</span><div id="profileRisks"></div></article>
+        </div>
+      </section>
+
+      <section class="profile-accordion is-open">
+        <button class="profile-accordion-trigger" type="button" data-profile-accordion aria-expanded="true" aria-controls="profileSquadPanel">
+          <span><b>球队名单与教练组</b><small id="profileSquadMeta">等待官方名单</small></span><i aria-hidden="true"></i>
+        </button>
+        <div class="profile-accordion-panel" id="profileSquadPanel">
+          <div class="profile-lineup-grid">
+            <article><header><span>首发阵容</span><small id="profileLineupSource"></small></header><div class="profile-player-list" id="profileStartingLineup"></div></article>
+            <article><header><span>替补席</span><small>官方比赛名单 / 参赛名单</small></header><div class="profile-player-list compact" id="profileSubstitutes"></div></article>
+            <article><header><span>教练组</span><small>职务以数据源登记为准</small></header><div class="profile-staff-list" id="profileStaff"></div></article>
+          </div>
+          <div class="profile-full-squad" id="profileFullSquad"></div>
+        </div>
+      </section>
+
+      <div class="profile-tactics-grid">
+        <section class="profile-accordion">
+          <button class="profile-accordion-trigger" type="button" data-profile-accordion aria-expanded="false" aria-controls="profileInPossessionPanel"><span><b>有球阶段</b><small>组织、推进与机会制造</small></span><i aria-hidden="true"></i></button>
+          <div class="profile-accordion-panel" id="profileInPossessionPanel" hidden><div class="profile-analysis-list" id="profileInPossession"></div></div>
+        </section>
+        <section class="profile-accordion">
+          <button class="profile-accordion-trigger" type="button" data-profile-accordion aria-expanded="false" aria-controls="profileOutPossessionPanel"><span><b>无球阶段</b><small>防守纪律、压迫与防线高度</small></span><i aria-hidden="true"></i></button>
+          <div class="profile-accordion-panel" id="profileOutPossessionPanel" hidden><div class="profile-analysis-list" id="profileOutPossession"></div></div>
+        </section>
+        <section class="profile-accordion">
+          <button class="profile-accordion-trigger" type="button" data-profile-accordion aria-expanded="false" aria-controls="profileStructurePanel"><span><b>阵型与人员结构</b><small>角色分工、轮换与阵容深度</small></span><i aria-hidden="true"></i></button>
+          <div class="profile-accordion-panel" id="profileStructurePanel" hidden><div class="profile-analysis-list" id="profileStructure"></div></div>
+        </section>
+        <section class="profile-accordion">
+          <button class="profile-accordion-trigger" type="button" data-profile-accordion aria-expanded="false" aria-controls="profileTransitionsPanel"><span><b>转换与比赛状态管理</b><small>攻防转换、领先与落后策略</small></span><i aria-hidden="true"></i></button>
+          <div class="profile-accordion-panel" id="profileTransitionsPanel" hidden><div class="profile-analysis-list" id="profileTransitions"></div></div>
+        </section>
+      </div>
+
+      <section class="profile-accordion is-open">
+        <button class="profile-accordion-trigger" type="button" data-profile-accordion aria-expanded="true" aria-controls="profileWorldCupPanel"><span><b>本届世界杯赛程与交手</b><small id="profileWorldCupCount"></small></span><i aria-hidden="true"></i></button>
+        <div class="profile-accordion-panel" id="profileWorldCupPanel"><div class="profile-world-cup" id="profileWorldCup"></div></div>
+      </section>
+      <section class="profile-accordion">
+        <button class="profile-accordion-trigger" type="button" data-profile-accordion aria-expanded="false" aria-controls="profileH2hPanel"><span><b>对本届对手的近四年交锋</b><small>2022-12-19 至今</small></span><i aria-hidden="true"></i></button>
+        <div class="profile-accordion-panel" id="profileH2hPanel" hidden><div class="profile-h2h" id="profileH2h"></div></div>
+      </section>
+      <section class="profile-accordion">
+        <button class="profile-accordion-trigger" type="button" data-profile-accordion aria-expanded="false" aria-controls="profileHistoryPanel"><span><b>近四年国家队比赛记录</b><small id="profileHistoryCount"></small></span><i aria-hidden="true"></i></button>
+        <div class="profile-accordion-panel" id="profileHistoryPanel" hidden><div class="profile-history" id="profileHistory"></div></div>
+      </section>
+    </section>
+  </div>
+  <script src="fallback-data.js"></script>
+  <script src="history-data.js"></script>
+  <script src="simulation.js"></script>
+  <script src="match-insight.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
