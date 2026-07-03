@@ -1,16 +1,23 @@
 {
   "version": 2,
-  "functions": {
-    "api/world-cup.js": {
-      "maxDuration": 20
-    },
-    "api/match-detail.js": {
-      "maxDuration": 20
-    },
-    "api/team-profile.js": {
-      "maxDuration": 20
-    }
-  },
+  "builds": [
+    { "src": "api/*.js", "use": "@vercel/node", "config": { "maxDuration": 20 } },
+    { "src": "*.html", "use": "@vercel/static" },
+    { "src": "*.js", "use": "@vercel/static" },
+    { "src": "*.css", "use": "@vercel/static" },
+    { "src": "*.json", "use": "@vercel/static" },
+    { "src": "*.webmanifest", "use": "@vercel/static" },
+    { "src": "*.txt", "use": "@vercel/static" }
+  ],
+  "routes": [
+    { "src": "/api/world-cup", "dest": "/api/world-cup.js" },
+    { "src": "/api/match-detail", "dest": "/api/match-detail.js" },
+    { "src": "/api/team-profile", "dest": "/api/team-profile.js" },
+    { "src": "/api/ai-match-advice", "dest": "/api/ai-match-advice.js" },
+    { "src": "/(.*\\.(?:js|css|json|webmanifest|txt|png|jpg|jpeg|svg|ico))", "dest": "/$1" },
+    { "src": "/", "dest": "/index.html" },
+    { "src": "/(.*)", "dest": "/index.html" }
+  ],
   "headers": [
     {
       "source": "/(.*)",
