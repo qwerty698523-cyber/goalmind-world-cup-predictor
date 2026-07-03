@@ -1568,7 +1568,7 @@ function renderModelAudit() {
     const eceOk = Number(probabilityAudit.ece) < 0.04;
     const top3Ok = Number(probabilityAudit.top3ScoreCoverage) >= 0.3;
     cards.push(
-      `<article class="${probabilityAudit.count >= 500 ? "good" : "warning"}"><span>样本规模</span><b>${probabilityAudit.count}</b><small>目标至少 500 场完全样本外比赛；当前世界杯样本只能作为滚动反馈，不能单独证明模型合格。</small></article>`,
+      `<article class="${probabilityAudit.count >= 500 ? "good" : "warning"}"><span>已回看比赛</span><b>${probabilityAudit.count}</b><small>系统会用已完赛场次持续回看预测表现；样本越多，概率参考会越稳定。当前结果适合观察趋势，不代表确定结论。</small></article>`,
       `<article class="${logLossOk ? "good" : "warning"}"><span>Log Loss</span><b>${auditNumber(probabilityAudit.logLoss)}</b><small>目标低于 1.00；Elo+Poisson 基准 ${auditNumber(eloPoisson.logLoss)}，越低越好。</small></article>`,
       `<article class="${brierOk ? "good" : "warning"}"><span>Brier Score</span><b>${auditNumber(probabilityAudit.brierScore)}</b><small>目标低于 0.58；随机三分类约 0.667，Elo+Poisson ${auditNumber(eloPoisson.brierScore)}。</small></article>`,
       `<article class="${eceOk ? "good" : "warning"}"><span>概率校准 ECE</span><b>${auditPercent(probabilityAudit.ece)}</b><small>目标低于 4%；这个指标衡量“60% 胜率是否真的接近赢 60%”。</small></article>`,
