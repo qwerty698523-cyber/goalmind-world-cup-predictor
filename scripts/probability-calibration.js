@@ -46,6 +46,12 @@ function calibrateOutcomeProbabilities(probabilities = {}, context = {}) {
   const sampleWeight = clamp((samples - 4) / 50, 0, 0.35);
   const ratingDifference = Math.abs(Number(context.ratingDifference || 0));
   const closeMatchWeight = Math.exp(-ratingDifference / 260);
+  const xg = context.xg || context.expectedGoals || {};
+  const xgHome = Number(xg.home ?? context.homeXg);
+  const xgAway = Number(xg.away ?? context.awayXg);
+  const hasXg = Number.isFinite(xgHome) && Number.isFinite(xgAway);
+  const xgDiff = hasXg ? Math.abs(xgHome - xgAway) : Infinity;
+  const xgTotal = hasXg ? xgHome + xgAway : Infinity;
   const drawSignal = clamp(
     Number(calibration.drawRisk || 0) * 0.18 + Number(calibration.resistanceDraw || 0) * 0.12,
     -0.08,
@@ -64,12 +70,6 @@ function calibrateOutcomeProbabilities(probabilities = {}, context = {}) {
     protectDrawCorrection = ratingDifference <= 90 && drawSignal > 0.03 && lift >= 0.015;
   }
 
-  const xg = context.xg || context.expectedGoals || {};
-  const xgHome = Number(xg.home ?? context.homeXg);
-  const xgAway = Number(xg.away ?? context.awayXg);
-  const hasXg = Number.isFinite(xgHome) && Number.isFinite(xgAway);
-  const xgDiff = hasXg ? Math.abs(xgHome - xgAway) : Infinity;
-  const xgTotal = hasXg ? xgHome + xgAway : Infinity;
   const topNonDraw = Math.max(homeWin, awayWin);
   const drawGap = topNonDraw - draw;
   const matureSamples = samples >= 10;

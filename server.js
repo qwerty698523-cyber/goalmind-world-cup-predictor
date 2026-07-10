@@ -27,7 +27,7 @@ const WEATHER_TTL = 30 * 60 * 1000;
 const AI_ADVICE_TTL = 10 * 60 * 1000;
 const ESPN_URL = process.env.ESPN_URL || "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260611-20260719&limit=200";
 const ELO_URL = process.env.ELO_URL || "https://www.eloratings.net/World.tsv";
-const RATING_MODEL_VERSION = "goalmind-dynamic-power-v3";
+const RATING_MODEL_VERSION = "goalmind-dynamic-power-v4";
 
 const eloCodes = {
   ALG: "DZ", ARG: "AR", AUS: "AU", AUT: "AT", BEL: "BE", BIH: "BA",
@@ -491,15 +491,19 @@ function selectCalibratedScore(matrix, homeXg, awayXg, probabilities, calibratio
       const probability = matrix[homeGoals]?.[awayGoals] || 0;
       const outcome = scoreOutcomeValue(homeGoals, awayGoals);
       const total = homeGoals + awayGoals;
-      const totalFit = Math.exp(-Math.abs(total - targetTotal) * 0.23);
+      const totalFit = Math.exp(-Math.abs(total - targetTotal) * 0.2);
       const xgFit = Math.exp(-(Math.abs(homeGoals - homeXg) + Math.abs(awayGoals - awayXg)) * 0.16);
       const outcomeFit = outcome === dominant
         ? 1.18
         : 0.86;
       const highScoreAggression = outcome !== "draw" ? highScorePressure * (decisiveEdge + goalEnvironment * 0.55) : 0;
       const aggression = 1 + Math.min(total, 6) * (0.035 + (calibration.conservativeIndex || 0) * 0.035 + highScoreAggression * 0.06);
-      const belowTarget = Math.max(0, targetTotal - total - 0.85);
-      const lowTotalPenalty = 1 - clamp(belowTarget * (0.08 + (calibration.lowTotalPressure || 0.12) * 0.75), 0, 0.42);
+      const belowTarget = Math.max(0, targetTotal - total - 0.75);
+      const lowTotalPenalty = 1 - clamp(
+        belowTarget * (0.1 + (calibration.lowTotalPressure || 0.12) + highScorePressure * 0.4 + highScoreAggression * 0.08),
+        0,
+        0.55
+      );
       const openDrawPenalty = outcome === "draw" && targetTotal > 2.35
         ? 1 - clamp((targetTotal - 2.35) * (0.08 + (calibration.drawCaution || 0)), 0, 0.34)
         : 1;
@@ -624,7 +628,7 @@ function normalizeCachedPayload(payload, errorMessage = "") {
       predictionBaselines: probabilityEvaluation.baselines,
       lockedProbabilityEvaluation: lockedProbabilityEvaluation.model,
       modelVersion: RATING_MODEL_VERSION,
-      source: { ...(payload?.source || {}), ratings: "GoalMind dynamic power rating v3" }
+      source: { ...(payload?.source || {}), ratings: "GoalMind dynamic power rating v4" }
     };
   }
   const modeledTeams = applyHistoricalModel(sourceTeams, fixtures);
@@ -647,7 +651,7 @@ function normalizeCachedPayload(payload, errorMessage = "") {
     predictionBaselines: probabilityEvaluation.baselines,
     lockedProbabilityEvaluation: lockedProbabilityEvaluation.model,
     modelVersion: RATING_MODEL_VERSION,
-    source: { ...(payload?.source || {}), ratings: "GoalMind dynamic power rating v3" }
+    source: { ...(payload?.source || {}), ratings: "GoalMind dynamic power rating v4" }
   };
 }
 
@@ -1647,7 +1651,7 @@ async function refreshData() {
         lockedProbabilityEvaluation: lockedProbabilityEvaluation.model,
         modelVersion: RATING_MODEL_VERSION,
         historySummary: { periodStart: history.periodStart, periodEnd: history.periodEnd, uniqueMatches: history.uniqueMatches },
-        source: { matches: "ESPN FIFA World Cup", ratings: "GoalMind dynamic power rating v3" }
+        source: { matches: "ESPN FIFA World Cup", ratings: "GoalMind dynamic power rating v4" }
       };
       await fs.promises.writeFile(CACHE_FILE, JSON.stringify(cache, null, 2), "utf8").catch(() => {});
       return cache;

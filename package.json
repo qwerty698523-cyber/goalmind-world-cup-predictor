@@ -5,11 +5,11 @@
   "description": "世界杯实时赛程与动态战力预测网站",
   "scripts": {
     "start": "node server.js",
-    "check": "node --check server.js && node --check api/world-cup.js && node --check api/match-detail.js && node --check api/team-profile.js && node --check api/ai-match-advice.js && node --check simulation.js && node --check match-insight.js && node --check app.js && node --check scripts/build-history-data.js && node --check scripts/audit-prediction-model.js && node --check scripts/analyze-prediction-errors.js && node --check scripts/model-evaluation.js && node --check scripts/model-baselines.js && node --check scripts/probability-calibration.js && node --check scripts/test-model-evaluation.js && node --check scripts/test-probability-calibration.js && node --check scripts/replay-prediction-model.js && node --check scripts/model-quality-gate.js && node --check scripts/release-check.js",
+    "check": "node --check server.js && node --check api/world-cup.js && node --check api/match-detail.js && node --check api/team-profile.js && node --check api/ai-match-advice.js && node --check simulation.js && node --check match-insight.js && node --check app.js && node --check scripts/build-history-data.js && node --check scripts/audit-prediction-model.js && node --check scripts/analyze-prediction-errors.js && node --check scripts/model-evaluation.js && node --check scripts/model-baselines.js && node --check scripts/probability-calibration.js && node --check scripts/test-model-evaluation.js && node --check scripts/test-probability-calibration.js && node --check scripts/test-model-score-selection.js && node --check scripts/replay-prediction-model.js && node --check scripts/model-quality-gate.js && node --check scripts/release-check.js",
     "data:history": "node scripts/build-history-data.js",
     "model:audit": "node scripts/audit-prediction-model.js",
     "model:errors": "node scripts/analyze-prediction-errors.js",
-    "model:test": "node scripts/test-model-evaluation.js && node scripts/test-probability-calibration.js",
+    "model:test": "node scripts/test-model-evaluation.js && node scripts/test-probability-calibration.js && node scripts/test-model-score-selection.js",
     "model:replay": "node scripts/replay-prediction-model.js",
     "model:gate": "node scripts/model-quality-gate.js",
     "release:check": "node scripts/release-check.js"

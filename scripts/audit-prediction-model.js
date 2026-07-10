@@ -79,7 +79,7 @@ function main() {
     futureAverage: Number(summary.futureAverage.toFixed(2))
   }, null, 2));
 
-  if (data.modelVersion !== "goalmind-dynamic-power-v3") {
+  if (data.modelVersion !== "goalmind-dynamic-power-v4") {
     throw new Error(`Unexpected model version: ${data.modelVersion}`);
   }
   if (future.length && summary.futureAverage < 2.15) {

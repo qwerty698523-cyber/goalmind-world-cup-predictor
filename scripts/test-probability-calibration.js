@@ -85,6 +85,22 @@ function run() {
     veryStrongFavorite.homeWin > veryStrongFavorite.draw && veryStrongFavorite.homeWin > veryStrongFavorite.awayWin,
     "softening should not flip the predicted outcome"
   );
+
+  const underconfidentFavorite = calibrateOutcomeProbabilities({ homeWin: 0.46, draw: 0.28, awayWin: 0.26 }, {
+    ratingDifference: 80,
+    xg: { home: 1.45, away: 1.05 },
+    calibration: {
+      samples: 85,
+      outcomeReliability: 0.71,
+      drawRisk: 0.02,
+      resistanceDraw: 0.02
+    }
+  });
+  assert.ok(
+    underconfidentFavorite.homeWin > 0.46,
+    "low-mid confidence favorites can be sharpened, but should not use broad replay accuracy to overfit every close match"
+  );
+
 }
 
 run();

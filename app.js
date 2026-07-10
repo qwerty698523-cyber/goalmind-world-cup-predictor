@@ -13,6 +13,7 @@ const minimalFallbackFixtures = [
 
 const bundledFallback = window.GOALMIND_FALLBACK || { teams: minimalFallbackTeams, fixtures: minimalFallbackFixtures, fetchedAt: null, stale: true };
 const historyBundle = window.GOALMIND_HISTORY || { periodStart: "2022-12-19", periodEnd: null, uniqueMatches: 0, teams: {} };
+const RATING_MODEL_VERSION = "goalmind-dynamic-power-v4";
 
 function applyHistoricalRatings(sourceTeams) {
   return sourceTeams.map((team) => {
@@ -39,7 +40,7 @@ function applyHistoricalRatings(sourceTeams) {
 
 function bundledTeamsForDisplay(payload = bundledFallback) {
   const sourceTeams = structuredClone(payload.teams || []);
-  const hasDynamicModel = payload.modelVersion === "goalmind-dynamic-power-v3"
+  const hasDynamicModel = payload.modelVersion === RATING_MODEL_VERSION
     && sourceTeams.some((team) => Number.isFinite(team.preTournamentElo) || Number.isFinite(team.lastMatchDelta) || Number(team.matches || 0) > 0);
   return hasDynamicModel
     ? sourceTeams.sort((a, b) => b.elo - a.elo)
@@ -67,7 +68,6 @@ const teamById = (id) => teams.find((team) => team.id === id);
 const pct = (n) => `${Math.round(n * 100)}%`;
 const currentFixture = () => fixtures.find((fixture) => fixture.id === state.selectedFixtureId);
 const ESPN_LIVE_URL = "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260611-20260719&limit=200";
-const RATING_MODEL_VERSION = "goalmind-dynamic-power-v3";
 const stageNames = {
   "group-stage": "小组赛", "round-of-32": "32 强赛", "round-of-16": "16 强赛",
   quarterfinals: "1/4 决赛", semifinals: "半决赛", "3rd-place-match": "季军赛", final: "决赛"
@@ -325,15 +325,19 @@ function selectCalibratedScore(matrix, homeXg, awayXg, probabilities, calibratio
       const probability = matrix[homeGoals]?.[awayGoals] || 0;
       const outcome = scoreOutcomeValue(homeGoals, awayGoals);
       const total = homeGoals + awayGoals;
-      const totalFit = Math.exp(-Math.abs(total - targetTotal) * 0.23);
+      const totalFit = Math.exp(-Math.abs(total - targetTotal) * 0.2);
       const xgFit = Math.exp(-(Math.abs(homeGoals - homeXg) + Math.abs(awayGoals - awayXg)) * 0.16);
       const outcomeFit = outcome === dominant
         ? 1.18
         : 0.86;
       const highScoreAggression = outcome !== "draw" ? highScorePressure * (decisiveEdge + goalEnvironment * 0.55) : 0;
       const aggression = 1 + Math.min(total, 6) * (0.035 + (calibration.conservativeIndex || 0) * 0.035 + highScoreAggression * 0.06);
-      const belowTarget = Math.max(0, targetTotal - total - 0.85);
-      const lowTotalPenalty = 1 - clamp(belowTarget * (0.08 + (calibration.lowTotalPressure || 0.12) * 0.75), 0, 0.42);
+      const belowTarget = Math.max(0, targetTotal - total - 0.75);
+      const lowTotalPenalty = 1 - clamp(
+        belowTarget * (0.1 + (calibration.lowTotalPressure || 0.12) + highScorePressure * 0.4 + highScoreAggression * 0.08),
+        0,
+        0.55
+      );
       const openDrawPenalty = outcome === "draw" && targetTotal > 2.35
         ? 1 - clamp((targetTotal - 2.35) * (0.08 + (calibration.drawCaution || 0)), 0, 0.34)
         : 1;
@@ -392,6 +396,12 @@ function calibrateOutcomeProbabilities(probabilities = {}, context = {}) {
   const sampleWeight = clamp((samples - 4) / 50, 0, 0.35);
   const ratingDifference = Math.abs(Number(context.ratingDifference || 0));
   const closeMatchWeight = Math.exp(-ratingDifference / 260);
+  const xg = context.xg || context.expectedGoals || {};
+  const xgHome = Number(xg.home ?? context.homeXg);
+  const xgAway = Number(xg.away ?? context.awayXg);
+  const hasXg = Number.isFinite(xgHome) && Number.isFinite(xgAway);
+  const xgDiff = hasXg ? Math.abs(xgHome - xgAway) : Infinity;
+  const xgTotal = hasXg ? xgHome + xgAway : Infinity;
   const drawSignal = clamp(
     Number(calibration.drawRisk || 0) * 0.18 + Number(calibration.resistanceDraw || 0) * 0.12,
     -0.08,
@@ -408,12 +418,6 @@ function calibrateOutcomeProbabilities(probabilities = {}, context = {}) {
     draw += lift;
     protectDrawCorrection = ratingDifference <= 90 && drawSignal > 0.03 && lift >= 0.015;
   }
-  const xg = context.xg || context.expectedGoals || {};
-  const xgHome = Number(xg.home ?? context.homeXg);
-  const xgAway = Number(xg.away ?? context.awayXg);
-  const hasXg = Number.isFinite(xgHome) && Number.isFinite(xgAway);
-  const xgDiff = hasXg ? Math.abs(xgHome - xgAway) : Infinity;
-  const xgTotal = hasXg ? xgHome + xgAway : Infinity;
   const topNonDraw = Math.max(homeWin, awayWin);
   const drawGap = topNonDraw - draw;
   const nearEvenGame = samples >= 10
@@ -926,7 +930,7 @@ async function fetchLivePayload(force) {
     fetchedAt: new Date().toISOString(), stale: false,
     teams: recalculateTeamMetrics(applyHistoricalRatings(bundledFallback.teams), liveFixtures), fixtures: liveFixtures,
     modelVersion: RATING_MODEL_VERSION,
-    source: { matches: "ESPN FIFA World Cup", ratings: "GoalMind dynamic power rating v3" }
+    source: { matches: "ESPN FIFA World Cup", ratings: "GoalMind dynamic power rating v4" }
   };
 }
 
